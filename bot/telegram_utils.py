@@ -43,10 +43,11 @@ async def start_client():
                 db.close()
         else:
             print("⚠️ Mensagem fora do padrão esperado. Ignorada.")
-        
+    
         
 
 # Iniciando o cliente do Telegram
 if __name__ == "__main__":
     import asyncio
     asyncio.run(start_client())
+
