@@ -1,53 +1,40 @@
-# Refatorando erro
-import sys
 import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
-
-# Importando as bibliotecas necessárias
-import os
-from telethon import TelegramClient, events
+import asyncio
 from dotenv import load_dotenv
-from message_parser import parse_signal_message
-from database.db import SessionLocal
-from crud.signal import create_signal
+from telethon import TelegramClient, events
+from datetime import datetime
+from bot.message_parser import parse_signal_message
+
+
 
 load_dotenv()
 
-# Carregando as variáveis de ambiente
 api_id = os.getenv("TELEGRAM_API_ID")
 api_hash = os.getenv("TELEGRAM_API_HASH")
-session_name = os.getenv('TELEGRAM_SESSION_NAME', 'robo_sinais')
+session_name = os.getenv("TELEGRAM_SESSION_NAME", "robo_sinais")
+GROUP_ID = int(os.getenv("TELEGRAM_GROUP_ID", "-1002008142020"))  # Mai Trader Free [ -1002439641464]
 
 client = TelegramClient(session_name, api_id, api_hash)
 
+@client.on(events.NewMessage)
+async def handle_new_message(event):
+    if event.chat_id != GROUP_ID:
+        return  # Ignora outras conversas
+
+    mensagem = event.message.message
+    print(f"📥 Mensagem recebida:\n{mensagem}\n")
+
+    dados = parse_signal_message(mensagem)
+    print("🧩 Dados extraídos:", dados)
+
+    # Aqui você pode acionar funções específicas para operar o sinal
+    if dados["ativo"] and dados["entrada"]:
+        print(f"✅ Sinal válido detectado para {dados['ativo']} às {dados['entrada'].time()}")
+
 async def start_client():
-    await client.start()
-    print("✅ Cliente do Telegram iniciado com sucesso!")
+    print("✅ Cliente conectado e rodando!")
+    await client.run_until_disconnected()
 
-    @client.on(events.NewMessage(chats=[1002439641464]))  # ID do grupo de sinais
-    async def handler(event):
-        message = event.message.message
-        print(f"\n📩 Nova mensagem recebida:\n{message}")
-
-        dados = parse_signal_message(message)
-        if dados:
-            print(f"✅ Dados extraídos com sucesso:\n{dados}")
-            try:
-                db = SessionLocal()
-                novo_sinal = create_signal(db, dados)
-                print(f"💾 Sinal salvo com ID: {novo_sinal.id}")
-            except Exception as e:
-                print(f"❌ Erro ao salvar no banco: {e}")
-            finally:
-                db.close()
-        else:
-            print("⚠️ Mensagem fora do padrão esperado. Ignorada.")
-    
-        
-
-# Iniciando o cliente do Telegram
 if __name__ == "__main__":
-    import asyncio
-    asyncio.run(start_client())
-
+    with client:
+        client.loop.run_until_complete(start_client())
