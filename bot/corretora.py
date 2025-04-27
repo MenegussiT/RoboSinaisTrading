@@ -1,6 +1,7 @@
 from playwright.async_api import async_playwright
 from dotenv import load_dotenv
 import os
+import asyncio
 
 load_dotenv()
 
@@ -14,8 +15,8 @@ async def logar_corretora():
         page = await browser.new_page()
         await page.goto(corretora)
 
-        await page.wait_for_selector('input[name="username"]')
-        await page.fill('input[name="username"]', email)
+        await page.wait_for_selector('input[name="identifier"]')
+        await page.fill('input[name="identifier"]', email)
 
         await page.wait_for_selector('input[name="password"]')
         await page.fill('input[name="password"]', senha)
@@ -24,3 +25,6 @@ async def logar_corretora():
 
         print("✅ Logado com sucesso na corretora Avalon!")
         return page  # mantém a página ativa pra próximos comandos
+
+if __name__ == "__main__":
+    asyncio.run(logar_corretora())
