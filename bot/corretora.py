@@ -9,7 +9,10 @@ email = os.getenv('CORRETORA_LOGIN')
 senha = os.getenv('CORRETORA_PASSWORD')
 corretora = os.getenv('CORRETORA_URL')
 
+browser_page = None
+
 async def logar_corretora():
+    global browser_page
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=False)
         page = await browser.new_page()
@@ -25,6 +28,11 @@ async def logar_corretora():
 
         print("✅ Logado com sucesso na corretora Avalon!")
         return page  # mantém a página ativa pra próximos comandos
+    
+    browser_page = page  # Armazena a página para uso posterior
+
+def get_browser_page():
+    return browser_page  # Retorna a página armazenada
 
 if __name__ == "__main__":
     asyncio.run(logar_corretora())
