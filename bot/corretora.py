@@ -9,30 +9,47 @@ email = os.getenv('CORRETORA_LOGIN')
 senha = os.getenv('CORRETORA_PASSWORD')
 corretora = os.getenv('CORRETORA_URL')
 
-browser_page = None
+playwright = None
+browser = None
+page = None
 
 async def logar_corretora():
-    global browser_page
-    async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=False)
-        page = await browser.new_page()
-        await page.goto(corretora)
+    global playwright, browser, page
 
-        await page.wait_for_selector('input[name="identifier"]')
-        await page.fill('input[name="identifier"]', email)
+    playwright = await async_playwright().start()
+    browser = await playwright.chromium.launch(headless=False)
+    page = await browser.new_page()
+    await page.goto(corretora)
 
-        await page.wait_for_selector('input[name="password"]')
-        await page.fill('input[name="password"]', senha)
+    await page.wait_for_selector('input[name="identifier"]')
+    await page.fill('input[name="identifier"]', email)
 
-        await page.click('button[type="submit"]')
+    await page.wait_for_selector('input[name="password"]')
+    await page.fill('input[name="password"]', senha)
 
-        print("✅ Logado com sucesso na corretora Avalon!")
-        return page  # mantém a página ativa pra próximos comandos
-    
-    browser_page = page  # Armazena a página para uso posterior
+    await page.click('button[type="submit"]')
+
+    print("✅ Logado com sucesso na corretora Avalon!")
+    return page
 
 def get_browser_page():
-    return browser_page  # Retorna a página armazenada
+    global page
+    return page
+
+async def executar_sinal(dados):
+    page = get_browser_page()
+    if page is None:
+        print("❌ Página do navegador não está disponível.")
+        return
+
+    print(f"📊 Executando ordem {dados['ordem']} para o ativo {dados['ativo']}")
 
 if __name__ == "__main__":
-    asyncio.run(logar_corretora())
+    loop = asyncio.get_event_loop()
+    try:
+        loop.run_until_complete(logar_corretora())
+        loop.run_forever()  # mantém o loop aberto para possíveis comandos posteriores
+    except KeyboardInterrupt:
+        print("⛔ Encerrando o robô manualmente.")
+    finally:
+        loop.close()
