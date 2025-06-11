@@ -32,6 +32,8 @@ Aproveitando o poder da programação assíncrona moderna e do gerenciamento rob
 ## ⚙️ **Estrutura do Projeto**
 
 O repositório é organizado para clareza e modularidade, facilitando a navegação e a extensão:
+
+
 📦 RoboSinaisTrading/
 │
 ├── bot/                       # Lógica central do bot para integração com Telegram e execução de ordens
