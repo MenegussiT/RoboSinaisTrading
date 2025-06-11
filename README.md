@@ -32,7 +32,7 @@ Aproveitando o poder da programação assíncrona moderna e do gerenciamento rob
 ## ⚙️ **Estrutura do Projeto**
 
 O repositório é organizado para clareza e modularidade, facilitando a navegação e a extensão:
-
+```
 📦 RoboSinaisTrading/
 │
 ├── bot/                       # Lógica central do bot para integração com Telegram e execução de ordens
@@ -58,8 +58,8 @@ O repositório é organizado para clareza e modularidade, facilitando a navegaç
 │
 ├── .env.example               # Modelo para variáveis de ambiente
 ├── requirements.txt           # Lista de dependências Python
-└── README.md              
-
+└── README.md                  # Visão geral e documentação do projeto
+```
 ## 🧪 **Começando e Rodando Testes**
 
 Para ter uma cópia local funcionando, siga estas etapas simples:
